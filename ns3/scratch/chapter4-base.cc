@@ -67,7 +67,7 @@ Ptr<OutputStreamWrapper> rtoStream;
 Ptr<OutputStreamWrapper> nextTxStream;
 Ptr<OutputStreamWrapper> nextRxStream;
 Ptr<OutputStreamWrapper> inFlightStream;
-// 輻輳状態をトレースするため追加した．
+// 为了追踪拥塞的状态，增加逻辑。
 // 2018/12/7, Ryoma Yasunaga
 Ptr<OutputStreamWrapper> congStateStream;
 uint32_t cWndValue;
@@ -149,7 +149,7 @@ NextRxTracer (SequenceNumber32 old, SequenceNumber32 nextRx)
 }
 
 
-// 輻輳状態をトレースするため追加した．
+// 为了追踪拥塞的状态，增加逻辑。
 // 2018/12/7 Ryoma Yasunaga
 static void
 CongStateTracer (TcpSocketState::TcpCongState_t old, TcpSocketState::TcpCongState_t nextState)
@@ -214,7 +214,7 @@ TraceNextRx (std::string &next_rx_seq_file_name)
   Config::ConnectWithoutContext ("/NodeList/2/$ns3::TcpL4Protocol/SocketList/1/RxBuffer/NextRxSequence", MakeCallback (&NextRxTracer));
 }
 
-// 輻輳状態をトレースするために追加した．
+// 为了追踪拥塞的状态，增加逻辑。
 // 2018/12/7 Ryoma Yasunaga
 static void
 TraceCongState (std::string &cong_state_file_name)
@@ -426,8 +426,8 @@ int main (int argc, char *argv[])
     {
       std::ofstream ascii;
       Ptr<OutputStreamWrapper> ascii_wrap;
-			// 今回は輻輳制御アルゴリズムごとにフォルダを分けるので，
-			// ファイル名の先頭に-がつかないように修正した．
+      // 本次时每个拥塞控制算法分开使用不同的目录，
+      // 因此这里将文件名头部的-去掉。
 			// 2018/12/7 Ryoma Yasunaga
       // ascii.open ((prefix_file_name + "-ascii").c_str ());
       // ascii_wrap = new OutputStreamWrapper ((prefix_file_name + "-ascii").c_str (),
@@ -436,8 +436,8 @@ int main (int argc, char *argv[])
                                             std::ios::out);
       stack.EnableAsciiIpv4All (ascii_wrap);
 
-			// 今回は輻輳制御アルゴリズムごとにフォルダを分けるので，
-			// ファイル名の先頭に-がつかないように修正した．
+			// 本次时每个拥塞控制算法分开使用不同的目录，
+      // 因此这里将文件名头部的-去掉。
 			// 2018/12/7 Ryoma Yasunaga
       // Simulator::Schedule (Seconds (0.00001), &TraceCwnd, prefix_file_name + "-cwnd.data");
       // Simulator::Schedule (Seconds (0.00001), &TraceSsThresh, prefix_file_name + "-ssth.data");
@@ -453,8 +453,8 @@ int main (int argc, char *argv[])
       Simulator::Schedule (Seconds (0.00001), &TraceNextTx, prefix_file_name + "next-tx.data");
       Simulator::Schedule (Seconds (0.00001), &TraceInFlight, prefix_file_name + "inflight.data");
       Simulator::Schedule (Seconds (0.1), &TraceNextRx, prefix_file_name + "next-rx.data");
-			// 輻輳状態をトレースするため追加した．
-			// 2018/12/7 Ryoma Yasunaga
+      // 为了追踪拥塞的状态，增加逻辑。
+      // 2018/12/7 Ryoma Yasunaga
       Simulator::Schedule (Seconds (0.00001), &TraceCongState, prefix_file_name + "cong-state.data");
     }
 

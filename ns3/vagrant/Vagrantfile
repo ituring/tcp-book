@@ -12,11 +12,11 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: <<-SHELL
     apt update
 
-    # Install utilities
+    # 安装组件
     apt install tree
     apt install -y gnuplot
 
-    # Install libraries required for ns-3.27
+    # 安装 ns-3.27 的必须库
     apt install -y gcc g++ python python-dev mercurial bzr gdb valgrind gsl-bin libgsl0-dev flex bison tcpdump sqlite sqlite3 libsqlite3-dev libxml2 libxml2-dev libgtk2.0-0 libgtk2.0-dev uncrustify doxygen graphviz imagemagick texlive texlive-latex-extra texlive-generic-extra texlive-generic-recommended texinfo dia texlive texlive-latex-extra texlive-extra-utils texlive-generic-recommended texi2html python-pygraphviz python-kiwi python-pygoocanvas libgoocanvas-dev python-pygccxml
     cd
     mkdir /home/vagrant/ns3
@@ -31,13 +31,13 @@ Vagrant.configure("2") do |config|
     #./test.py
     cd
 
-    # Download files from GitHub repo.
-    # Delete existing /home/vagrant/temp in order to avoiding error 
-    # when reload --provision.
+    # 从Github 仓库中下载文件.
+    # 删除当前的 /home/vagrant/temp 文件夹
+    # 防止在reload --provision的时候出错
     rm -r /home/vagrant/tmp
-    git clone https://github.com/neko9laboratories/tcp-book.git /home/vagrant/tmp/
+    git clone https://github.com/ituring/tcp-book.git /home/vagrant/tmp/
 
-    # Copy python scripts, shell scripts, scratch directory to ns-3 home direcory.
+    # 复制python脚本, shell脚本, scratch目录到ns-3根目录
     cp /home/vagrant/tmp/ns3/*.py /home/vagrant/ns3/ns-allinone-3.27/ns-3.27/
     cp /home/vagrant/tmp/ns3/*.sh /home/vagrant/ns3/ns-allinone-3.27/ns-3.27/
     cp /home/vagrant/tmp/ns3/scratch/* /home/vagrant/ns3/ns-allinone-3.27/ns-3.27/scratch/
@@ -50,7 +50,7 @@ Vagrant.configure("2") do |config|
     cd /home/vagrant/ns3/ns-allinone-3.27/ns-3.27
     chmod -R 777 *
 
-    # Update waf configuration
+    # 更新 waf 配置
     ./waf clean
     ./waf
 
@@ -58,13 +58,13 @@ Vagrant.configure("2") do |config|
     chmod -R 777 *
     shopt -u dotglob
 
-    # Install python libraries.
+    # 安装python库
     apt install python3-pip python3-dev -y
     pip3 install -r requirements.txt
 
   SHELL
 
-  # Sync shared directory with host OS.
+  # 与宿主OS 分享共享文件夹内容
   config.vm.synced_folder './shared', '/home/vagrant/ns3/ns-allinone-3.27/ns-3.27/data', create: true, owner: 'vagrant', group: 'vagrant'
 
 end

@@ -11,20 +11,20 @@ from tqdm import tqdm
 sns.set_style(style='ticks')
 plt.rcParams['font.size'] = 14
 
-# 計算結果を出力するディレクトリ名．
+# 输出计算结果的目录名
 save_path = 'data/chapter4/'
-# TCPアルゴリズム一覧．
+# TCP算法一览
 algorithms = [
     'TcpNewReno', 'TcpHybla', 'TcpHighSpeed', 'TcpHtcp',
     'TcpVegas', 'TcpScalable', 'TcpVeno', 'TcpBic', 'TcpYeah',
     'TcpIllinois', 'TcpWestwood']
 
-# 保存用ディレクトリを作成．
+# 创建保存文件用的目录
 if not os.path.exists(save_path):
     os.mkdir(save_path)
 
 
-# コマンドライン引数を追加したコマンドを作成する関数
+# 生成完整命令行参数命令的函数
 def make_command(
         algorithm=None, prefix_name=None, tracing=None,
         duration=None, error_p=None, bandwidth=None, delay=None,
@@ -32,19 +32,19 @@ def make_command(
         data=None, mtu=None, flow_monitor=None, pcap_tracing=None):
 
     """
-    - algorithm: 輻輳制御アルゴリズム名．
-    - prefix_name: 出力するファイルのプレフィックス名．pwdからの相対パスで表す．
-    - tracing: トレーシングを有効化するか否か．
-    - duration: シミュレーション時間[s]．
-    - error_p: パケットエラーレート．
-    - bandwidth: ボトルネック部分の帯域．例：'2Mbps'
-    - delay: ボトルネック部分の遅延．例：'0.01ms'
-    - access_bandwidth: アクセス部分の帯域．例:'10Mbps'
-    - access_delay: アクセス部分の遅延．例:'45ms'．
-    - data: 送信するデータ総量[MB]．
-    - mtu: IPパケットの大きさ[byte]．
-    - flow_monitor: Flow monitorを有効化するか否か．
-    - pcap_tracing: PCAP tracingを有効化するか否か．
+    - algorithm: 拥塞控制算法名称
+    - prefix_name: 输出文件的前缀名。表示从pwd开始的相对路径。
+    - tracing: 是否打开追踪功能。
+    - duration: 模拟时间[s]。
+    - error_p: 数据包错误率。
+    - bandwidth: 瓶颈部分的带宽。例：'2Mbps'
+    - delay: 瓶颈部分的时延。例：'0.01ms'
+    - access_bandwidth: 访问部分的带宽。例:'10Mbps'
+    - access_delay: 访问部分的时延。例:'45ms'。
+    - data: 发送数据总量[MB]。
+    - mtu: IP数据包的大小[byte]。
+    - flow_monitor: 是否打开Flow monitor功能。
+    - pcap_tracing: 是否打开PCAP tracing功能。
     """
 
     cmd = './waf --run "chapter4-base'
@@ -81,7 +81,7 @@ def make_command(
 
 def read_data(prefix_name, metric, duration):
     """
-    {prefix_name}{metric}.dataを読みだす関数
+    读取{prefix_name}{metric}.data的函数
     """
 
     file_name = '{}{}.data'.format(prefix_name, metric)
@@ -90,7 +90,7 @@ def read_data(prefix_name, metric, duration):
     data = data[data.sec <= duration].reset_index(
         drop=True)
 
-    # 作画用に，最終行にduration秒のデータを追加．
+    # 用于绘图，为最终行增加duration秒の的数据。
     if duration > data.sec.max():
         tail = data.tail(1)
         tail.sec = duration
@@ -103,8 +103,8 @@ def plot_metric(
         y_deno=1, x_ticks=False):
 
     """
-    metricの時系列変化をプロットする関数．
-    y_denoは単位変換に用いる（byte->segment）
+    绘制metric的时间序列变化的函数。
+    y_deno用于单位转换（byte->segment）
     """
 
     plt.step(
@@ -113,11 +113,11 @@ def plot_metric(
     plt.xlim(0, x_max)
     plt.ylabel(y_label)
 
-    # y軸の最大値．
+    # y轴最大值
     if y_max:
         plt.ylim(0, y_max)
 
-    # x軸のメモリを表示するか否か．
+    # 是否显示x轴的内存数据
     if x_ticks:
         plt.xlabel('time[s]')
     else:
@@ -127,22 +127,22 @@ def plot_metric(
 def plot_cong_state(
         cong_state, x_max, y_label, x_ticks=False):
     """
-    cong_stateの時系列変化をプロットする関数．
+    绘制cong_state的时间序列变化的函数。
     """
 
-    # 2:rcwは今回の分析対象外なので，
-    # 3，4を一つ前にずらす．
+    # 2:rcw不是本次的分析对象，
+    # 3，因此将4往前错开一格．
     new_state = {
         0: 0, 1: 1, 3: 2, 4: 3}
 
-    # 最初はOpen状態．
+    # 最初是Open状态
     plt.fill_between(
         [0, x_max],
         [0, 0],
         [1, 1],
         facecolor='gray')
 
-    # 各輻輳状態ごとに該当秒数を塗りつぶす．
+    # 为了每个拥塞状态分别涂上对应秒数的颜色。
     for target_state in range(4):
         for sec, state in cong_state.values:
             if new_state[state] == target_state:
@@ -156,7 +156,7 @@ def plot_cong_state(
                 [target_state+1, target_state+1],
                 facecolor=color)
 
-    # 各服装状態を区切る横線を描画．
+    # 绘制区分各个拥塞状态的横线。
     for i in range(1, 4):
         plt.plot([0, x_max], [i, i], 'k-')
 
@@ -167,24 +167,24 @@ def plot_cong_state(
         ['open', 'disorder', 'recovery', 'loss'])
     plt.ylabel(y_label)
 
-    # x軸のメモリを表示するか否か．
+    # 是否显示x轴的的内存数据。
     if x_ticks:
         plt.xlabel('time[s]')
     else:
         plt.xticks([])
 
 
-# algorithmのcwnd，ssth，rtt，cong-stateをプロットする関数．
+# 绘制algorithm种cwnd，ssth，rtt，cong-state的函数。
 def plot_algorithm(algo, duration, save_path):
     path = '{}{}/'.format(save_path, algo)
 
-    # データの読み込み
+    # 读取数据
     cwnd = read_data(path, 'cwnd', duration)
     ssth = read_data(path, 'ssth', duration)
     rtt = read_data(path, 'rtt', duration)
     cong_state = read_data(path, 'cong-state', duration)
 
-    # 描画
+    # 绘制
     plt.figure(figsize=(12, 12))
     plt.subplot(4, 1, 1)
     plot_metric(cwnd, duration, 'cwnd[byte]')
@@ -196,7 +196,7 @@ def plot_algorithm(algo, duration, save_path):
     plt.subplot(4, 1, 3)
     plot_metric(rtt, duration, 'rtt[s]')
     plt.subplot(4, 1, 4)
-    # 一番下のプロットのみx軸を描画．
+    # 只绘制最下面图形的x轴。
     plot_cong_state(
         cong_state, duration, 'cong-state',
         x_ticks=True)
@@ -206,14 +206,14 @@ def plot_algorithm(algo, duration, save_path):
         save_path, algo.lower()))
 
 
-# ns-3コマンドを実行して，結果をプロットする関数．
+# 执行ns-3命令，绘制结果的函数。
 def execute_and_plot(
         algo, duration, save_path=save_path, error_p=None,
         bandwidth=None, delay=None, access_bandwidth=None,
         access_delay=None, data=None, mtu=None,
         flow_monitor=None, pcap_tracing=None):
 
-    # 保存用ディレクトリを作成．
+    # 生成用于保存的目录。
     path = '{}{}/'.format(save_path, algo)
     if not os.path.exists(path):
         os.mkdir(path)

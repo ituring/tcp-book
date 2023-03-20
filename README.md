@@ -1,27 +1,32 @@
-# TCP技術入門――進化を続ける基本プロトコル
+# TCP是怎样工作的
 
-Technical Introduction to TCP: An essential protocol keeping evolution
+![cover](fig/cover.jpg)
 
-![cover](fig/cover.png)
+[TCP是怎样工作的的支持页面](https://www.ituring.com.cn/book/2851)．
 
-[TCP技術入門――進化を続ける基本プロトコル](https://gihyo.jp/book/2019/978-4-297-10623-2)のサポートページです．
+## 环境搭建
 
-## 環境構築
+本书使用VirtualBox、Vagrant以及X Server的组合搭建模拟环境。接下来介绍环境构建的方法。
 
-本書では，VirtualBoxとVagrantとX Serverを組み合わせてシミュレーション環境を構築します．以下では，そのセットアップ方法を説明します．
+### 验证环境
 
-### 検証環境
+已在以下的环境中进行了验证。模拟基本上是通过虚拟机进行的，因此只需搭建出如下所示的VirtualBox，Vagrant和X Server的环境，masOS以外的系统也可以无碍地完成模拟。
 
-以下の環境で動作を確認しました．基本的に仮想マシン上でシミュレーションを行いますので，下記のVirtualBoxとVagrantとX Serverの環境が構築できれば，macOS以外の環境でも問題なく実行できるはずです．
+- OS：masOS Mojave 10.14.3
+- 处理器：2.9GHz Intel Core i7
+- 内存：16GB 2133MHz LPDDR3
+- VirtualBox：6.0.4r128413
+- Vagrant：2.2.4
 
-- OS: macOS Mojave, 10.14.3
-- プロセッサ: 2.9 GHz Intel Core i7
-- メモリ: 16GB 2133 MHz LPDDR3
-- VirtualBox: 6.0.4r128413
-- Vagrant: 2.2.4
+此外，译者在如下环境下进行了验证：
+- OS：Windows 10 专业版 21H2 19044.2604
+- 处理器：Intel(R) Core(TM) i9-9900K CPU @ 3.60GHz
+- 内存：32.0 GB 3200MHz
+- VirtualBox：6.1.28 r147628 (Qt5.6.2)
+- Vagrant：2.3.4
+- MobaXterm Personal Edition 23.0 Build 5042
 
-VirtualBoxでは以下のような環境で仮想マシンを立ち上げ，動作を確認しました．
-
+已在如下的VirtualBox虚拟机环境下进行了验证。
 - Ubuntu: 16.04
 - WireShark: 2.6.5
 - ns-3: 3.27
@@ -29,15 +34,15 @@ VirtualBoxでは以下のような環境で仮想マシンを立ち上げ，動�
 - gcc: 5.4.0
 - make: 4.1
 
-なお，2019年4月1日現在，ns-3のインストールガイドがUbuntu 18.04に対応していないため，本書ではUbuntu 16.04を採用します．また，2019年4月1日現在，5章や6章で利用するCUBICやBBRのモジュールがns-3.28以上に対応していないため，本書ではn-3.27を利用します．
+此外，到2019年4月1日为止，ns-3的安装向导并没有适配Ubuntu 18.04，因此本书使用Ubuntu 16.04。另外，到2019年4月1日为止，第5章和第6章使用的CUBIC和BBR模块没有适配ns-3.28以上的版本，因此本书使用ns-3.27。
 
-4GBのメモリを搭載した仮想マシンを起動するため，それ以上のメモリを積んだ物理マシンをご用意頂く必要があることにご注意ください．
+请注意，由于要运行4GB内存的虚拟机，因此需要准备拥有4GB以上内存的物理机。
 
 ### Oracle VM VirtualBox
 
-2019年4月1日現在，VirtualBoxは[Webサイト](https://www.virtualbox.org/)の`Download`ページから，ホストOSに対応したインストールパッケージをダウンロードすることができます．インストーラを起動すれば，VirtualBoxをインストールできます．
+到2019年4月1日为止，从VirtualBox的[Web官网](https://www.virtualbox.org/)的`Download`页面上可以下载到与宿主OS适配的安装包。运行安装程序可以完成VirtualBox的安装。
 
-macOSの場合は，ターミナルソフトウェア（例えばターミナルなど）で以下のコマンドを実行して，バージョンが表示されれば，VirtualBoxのインストールが完了していることが確認できます．お手元の環境によって，表示されるバージョンが異なる可能性がありますのでご注意ください．
+macOS系统下，打开终端程序（例如Terminal.app），执行以下命令，就可以确认VirtualBox的安装情况。请注意，根据所使用的环境不同，终端上显示的版本号可能不一样。
 
 ```shell
 $ VBoxManage -v
@@ -46,9 +51,9 @@ $ VBoxManage -v
 
 ### Vagrant
 
-2019年4月1日現在，Vagrantの[Webサイト](https://www.vagrantup.com/)の`Download`ボタンをクリックすると，インストールパッケージのダウンロード画面に遷移します．お手元の環境に対応したパッケージを選択し，ダウンロードが終わったらインストーラを実行しましょう．
+在2019年4月1日的时间点，点击Vagrant的[Web网站](https://www.vagrantup.com/)的[Download]按钮，页面会跳转到安装包的下载界面。请根据所使用的环境，选择对应的安装包，下载完成之后执行安装程序完成安装。
 
-macOSの場合は，ターミナルソフトウェア（例えばターミナルなど）で以下のコマンドを実行して，バージョンが表示されれば，Vagrantのインストールが完了していることが確認できます．お手元の環境によって，表示されるバージョンが異なる可能性がありますのでご注意ください．
+macOS系统下，请在终端程序(Terminal.app等)中执行以下命令。如果有输出对应的版本号，则说明Vagrant已经安装完毕。请注意，根据所使用的环境不同，终端上显示的版本号可能不一样。
 
 ```shell
 $ vagrant -v
@@ -57,17 +62,31 @@ $ vagrant -v
 
 ### X server
 
-本書では，ゲストOS上のWireSharkをX window system経由で操作しますので，ホストOS上でX serverの環境を構築する必要があります．
+本书在虚拟机OS上使用X Window System运行Wireshark，因此需要在物理机OS上搭建X Server环境。
 
-2019年4月1日現在，macOS X Sierraの場合は，[XQuartzプロジェクト](https://www.xquartz.org/)からX11サーバを入手できます．他のOSをお使いの場合は，対応が異なりますのでご注意ください．
+在2019年4月1日的时间点，macOS X Serra系统下，可以通过[XQuartz项目](https://www.xquartz.org/)的Web网站获取X11 Server（X11.app）。请注意，如果使用其他OS，获取的方式有所不同。
 
-X serverの動作を確認するため，仮想マシン上のGUIアプリケーションを起動してみましょう．まず，ダウンロードした本書のソースコードディレクトリの`wireshark/vagrant/`に移動し，以下のコマンドを実行してください．
+Windows 操作系统可以使用[MobaXterm](https://mobaxterm.mobatek.net/)
+
+为了验证X Server的运行情况，请启动虚拟机上的GUI应用程序。首先，请打开已下载的本书源代码，定位到wireshark/vagrant目录，执行以下命令。
 
 ```shell
 $ vagrant up
 ```
 
-4章で利用するWireSharkの仮想環境が立ち上がります（しばらく時間がかかることがあります）．以下のコマンドでSSH接続し，`xeyes`を起動してみましょう．
+这里Windows操作系统可能会报错，如下：
+```bash
+process_builder.rb:44:in `encode!': "\\xE5" to UTF-8 in conversion from ASCII-8BIT to UTF-8 to UTF-16LE (Encoding::UndefinedConversionError)
+```
+请找到报错信息的process_builder.rb 44行，编码位置换成一下：
+```bash
+#newstr.encode!('UTF-16LE')
+newstr.encode!('UTF-16LE', invalid: :replace, undef: :replace, replace: '?')
+```
+
+第4章所使用的Wireshark虚拟环境就搭建完成了（可能会花费一点时间）。接下来执行下面的命令，进行SSH登录，启动`xeyes`。
+
+注意Windows操作系统，在`MobaXterm`中运行`vagrant ssh guest1`之前，请先运行`cmd.exe`，启动命令行，然后再运行`vagrant ssh guest1`，否则会报错。
 
 ```shell
 $ vagrant ssh guest1
@@ -89,33 +108,34 @@ $ vagrant ssh guest1
 
 vagrant@guest1:~$ xeyes
 ```
-
-以下のように二つの目玉が表示されることを確認しましょう．
+请确认是否有下图所示的两个眼球出现。
 
 ![xeyes](fig/xeyes.png)
 
-一旦ログアウトして，仮想マシンを停止しましょう．
+请执行以下命令，暂时登出，停止运行虚拟机。
 
 ```shell
 vagrant@guest1:~$ exit
 $ vagrant halt
 ```
 
-## シミュレーション環境の確認
+## 模拟环境的确认
 
-本書では，WireSharkおよびns3でシミュレーションを行います．以下では，正しく環境を構築できているか確認します．
+本书使用Wireshark和ns3进行模拟。接下来确认一下是否环境构建是否完成。
 
 ### WireShark
 
-VirtualBox，VagrantおよびX serverの環境構築が済んでいることを確認したら，[このGitHubレポジトリ](https://github.com/neko9laboratories/tcp-book)を任意のディレクトリにクローンしましょう．`wireshark/vagrant`ディレクトリに移動し，`vagrant up`を実行します．これで，2台の仮想マシン上にUbunut 16.04環境が構築されます．
+当确认完VirtualBox和Vagrant的环境已经搭建完成之后，请将[此Github代码库](https://github.com/ituring/tcp-book)克隆到任意目录。接下来打开`wireshark/vagrant` 目录，执行`vagrant up`命令。这样，就可以在两台虚拟机上完成Ubuntu 16.04的环境搭建。
 
 ```shell
-$ git clone https://github.com/neko9laboratories/tcp-book.git
+$ git clone https://github.com/ituring/tcp-book.git
 $ cd tcp-book/wireshark/vagrant
 $ vagrant up
 ```
 
-以下のコマンドでゲストOSにSSH接続しましょう．ログインメッセージが表示され，プロンプトが`vagrant@guest1:~$`に変わります．
+使用以下的命令，ssh连接到Guest操作系统上。在登录消息显示之后，命令行提示会变成`vagrant@guest1:~$`。
+
+注意Windows操作系统，在`MobaXterm`中运行`vagrant ssh guest1`之前，请先运行`cmd.exe`，启动命令行，然后再运行`vagrant ssh guest1`，否则会报错。
 
 ```shell
 $ vagrant ssh guest1
@@ -138,7 +158,7 @@ $ vagrant ssh guest1
 vagrant@guest1:~$
 ```
 
-WireSharkを起動してみましょう．
+启动Wireshark。
 
 ```shell
 vagrant@guest1:~$ wireshark
@@ -146,7 +166,7 @@ vagrant@guest1:~$ wireshark
 
 ![wireshark](fig/wireshark.png)
 
-図4.18のようにWireSharkが起動することを確認したら，準備は完了です．一旦ログアウトして，仮想マシンを停止しましょう．
+当看到如图4.18一样的画面时，则表示Wireshark已经启动完成，准备工作也就完成了。此时请先登出，并关闭虚拟机。
 
 ```shell
 vagrant@guest1:~$ exit
@@ -155,15 +175,18 @@ $ vagrant halt
 
 ### ns3
 
-VirtualBoxおよびVagrantのインストールが済んでいることを確認したら，[このGitHubレポジトリ](https://github.com/neko9laboratories/tcp-book)を任意のディレクトリにクローンしましょう．`ns3/vagrant`ディレクトリに移動し，`vagrant up`を実行します．これで，仮想マシン上でUbunut 16.04が立ち上がり，ns-3の環境構築が実行されます．なお，2019年4月1日現在，5章や6章で利用するCUBICやBBRのモジュールがns-3.28以上に対応していないため，本書ではn-3.27を利用します．ns-3の環境構築にはしばらく時間がかかりますので，気長にお待ち下さい．
+当确认已经准备好VirtualBox和Vagrant的环境之后，请将[此Github代码库](https://github.com/ituring/tcp-book)克隆到任意目录。打开其中的`ns3/vagrant`目录，执行`vagrant up`命令。如此一来，就在虚拟机上完成了安装Ubuntu 16.04，并搭建ns-3的过程。另外，在2019年4月1日的时间点，第5章和第6章所使用的CUBIC和BBR模块不支持ns-3.28以上版本，因此本书使用ns-3.27版本。由于搭建ns-3环境相当花时间，请务必耐心等待 。
+
 
 ```shell
-$ git clone https://github.com/neko9laboratories/tcp-book.git
+$ git clone https://github.com/ituring/tcp-book.git
 $ cd tcp-book/ns3/vagrant
 $ vagrant up
 ```
 
-ゲストOSにSSH接続しましょう．
+接下来，ssh连接到Guest操作系统上。
+
+注意Windows操作系统，在`MobaXterm`中运行`vagrant ssh`之前，请先运行`cmd.exe`，启动命令行，然后再运行`vagrant ssh`，否则会报错。
 
 ```shell
 $ vagrant ssh
@@ -186,26 +209,29 @@ $ vagrant ssh
 vagrant@ubuntu-xenial:~$
 ```
 
-上記のようにプロンプトが`vagrant@ubuntu-xenial:~$`に変わったら，SSH接続成功です．
+如上所述，当提示出现`vagrant@ubuntu-xenial:~$`之后，SSH就连接成功了。
 
-## 正誤表
+## 勘误表
 
-本書の正誤情報は以下のページで公開しています．
+本书的勘误信息在以下的页面中公开。
 
-https://github.com/neko9laboratories/tcp-book/wiki/errata
+https://www.ituring.com.cn/book/2851
 
-本ページに掲載されていない誤植など間違いを見つけた方は，[技術評論社の問い合わせページ](https://gihyo.jp/site/inquiry/book?ISBN=978-4-297-10623-2)までお知らせください．
+如果您发现了本页面尚未公布的问题，请在[本书的支持页面](https://www.ituring.com.cn/book/2851)予以告知。
 
-## 著者プロフィール
+## 作者介绍
 
-### 安永遼真（やすながりょうま）
+### 安永辽真
 
-2011年東京大学工学部卒業，2013年東京大学大学院工学系研究科航空宇宙工学専攻修了，同年日本電信電話株式会社入社，2016年Nokia Bell Labs出向。おもにコンピューターネットワークの数理モデル化に関する研究に従事。2018年より都内マーケティング会社に勤務。現在は機械学習・統計解析を用いたマーケティング技術の研究に従事する傍ら，趣味でコンピューターネットワークの研究を続けている。
+2011年毕业于东京大学工学部，2013年硕士毕业于东京大学研究生院工学系，同年入职日本电信电话株式会社，2016年被派往诺基亚贝尔实验室进修。主要从事计算机网络模型的研究。 
 
-### 中山悠（なかやまゆう）
+### 中山悠
+2008年毕业于东京大学，入职日本电信电话株式会社，2018年博士毕业于东京大学电子信息专业，目前在东京农工大学担任副教授，研究移动计算、低延迟网络和物联网等。
 
-2006年東京大学農学部卒業，2008年東京大学大学院新領域創成科学研究科自然環境学専攻修了，同年日本電信電話株式会社入社。2018年東京大学大学院情報理工学系研究科電子情報学専攻博士課程修了。博士（情報理工学）。現在，東京農工大学工学研究院・准教授。モバイルコンピューティング，低遅延ネットワーク，IoT等の研究に取り組む。平成29年度東京大学大学院情報理工学系研究科長賞等。
+### 丸田一辉
 
-### 丸田一輝（まるたかずき）
+2008年毕业于九州大学，入职日本电信电话株式会社，2016年博士毕业于九州大学信息智能工学专业，2017年3月成为千叶大学助教，研究无线网络中的抗干扰技术。曾获得日本电子信息通信学会（IEICE）论文奖、日本无线电通信系统（RCS）研究会最优秀贡献奖等。
 
-2006年九州大学工学部卒業，2008年九州大学大学院システム情報科学府知能システム学専攻修了，同年日本電信電話株式会社入社。2016年九州大学大学院システム情報科学府情報知能工学専攻博士後期課程修了。博士（工学）。2017年3月より千葉大学大学院工学研究院・助教。無線ネットワークにおける干渉低減技術の研究に従事。2017年度電子情報通信学会論文賞，RCS研究会最優秀貢献賞等。
+### 尹修远
+
+毕业于华中科技大学，现从事客户端开发工作。曾任职腾讯游戏平台，从事网络加速相关技术研发，对TCP/IP等网络技术有自己独到的见解。
